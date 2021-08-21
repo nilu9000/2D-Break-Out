@@ -67,6 +67,83 @@ function moveUser(event) {
   }
 }
 
+function drawBall() {
+  ball.style.left = ballPosition[0] + "px"
+  ball.style.bottom = ballPosition[1] + "px"
+}
+
+
+function createBall() {
+  ball = document.createElement("div")
+  ball.classList.add("ball")
+  drawBall()
+  grid.appendChild(ball)
+}
+
+function moveBall() {
+  ballPosition[0] += ballDirectionX
+  ballPosition[1] += ballDirectionY
+
+  drawBall()
+  checkWallCollision()
+  checkBlockCollision()
+  // checkUserCollision()
+}
+
+function checkBlockCollision() {
+  blocks.forEach((block, index) => {
+    let x_ball = ballPosition [0]
+    let y_ball = ballPosition [1]
+    let x_block = block.bottomLeft[0]
+    let y_block = block.bottomLeft[1]
+
+    if (
+      x_ball + BALL_SIZE > x_block &&
+      x_ball < x_block  + Block.width &&
+      y_ball + BALL_SIZE > y_block &&
+      y_ball < y_block + Block.height
+    ) {
+      
+    }
+  })
+}
+
+function changeDirection(changeX, changeY) {
+  ballDirectionX *= changeX
+  ballDirectionY *= changeY
+}
+
+function checkWallCollision() {
+    // Kollar när bollen studsar på vänster vägg
+    if (ballPosition[0] < 0) {
+      changeDirection(-1, 1)
+    }
+  
+  // Kollar när bollen studsar på höger vägg
+  if (ballPosition[0] >= BOARD_WIDTH - BALL_SIZE) {
+    changeDirection(-1, 1)
+  }
+
+  // Kollar när bollen studsar på taket
+  if (ballPosition[1] >= BOARD_HEIGHT - BALL_SIZE) {
+    changeDirection(1, -1)
+  }
+  // Kollar när bollen studsar på golvet
+  if (ballPosition[1] < 0) {
+    gameOver()
+  }
+}
+
+function gameOver() {
+  resetGame()
+  gameMessage.innerText = "Game Over - Your Score Is " + score
+}
+
+function  resetGame() {
+  clearInterval(moveBall)
+  removeEventListener("keydown", (e) => moveUser(e))
+}
+
 function addBlock(block, index) {
   const b = document.createElement("div");
   b.classList.add("block");
@@ -101,6 +178,7 @@ function createBlocksStart() {
   })
 }
 
+
 function main() {
   removeEventListener("load",main)
 
@@ -108,6 +186,9 @@ function main() {
   addlisteners()
   createBlocksStart()
   createUser()
+  createBall()
+
+  gameTimer = setInterval(moveBall, 25)
 }
 
 
