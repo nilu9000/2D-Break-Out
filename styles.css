@@ -59,7 +59,7 @@ html {
     position: absolute;
     width: 100px;
     height: 20px;
-    background-color: lightskyblue;
+    background-color: rgb(87, 155, 197);
   }
   
   .is-hit {

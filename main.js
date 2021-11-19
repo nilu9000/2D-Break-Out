@@ -87,7 +87,7 @@ function moveBall() {
   drawBall()
   checkWallCollision()
   checkBlockCollision()
-  // checkUserCollision()
+  checkUserCollision()
 }
 
 function checkBlockCollision() {
@@ -103,10 +103,30 @@ function checkBlockCollision() {
       y_ball + BALL_SIZE > y_block &&
       y_ball < y_block + Block.height
     ) {
-      
+      score  = score + block.score
+      gameMessage.innerText = "Score: " + score
+      let allBlocks = Array.from(document.querySelectorAll(".block"))
+      allBlocks[index].classList.remove("block")
+      blocks.splice(index, 1)
+
+      changeDirection(1, -1 )
     }
   })
+
+  if (blocks.length === 0) {
+    youWin()
+  }
 }
+
+function checkUserCollision() {
+  if (ballPosition[1] <= userStartPosition[1] + USER_HEIGHT &&
+    ballPosition[0] > userPosition[0] &&
+    ballPosition[0] < userPosition[0] + USER_WIDTH
+    ) {
+    changeDirection(1, -1)
+  }
+}
+
 
 function changeDirection(changeX, changeY) {
   ballDirectionX *= changeX
@@ -139,8 +159,13 @@ function gameOver() {
   gameMessage.innerText = "Game Over - Your Score Is " + score
 }
 
+function youWin() {
+  resetGame()
+  gameMessage.innerText = "All Cleared!! - Your Score Is " + score
+}
+
 function  resetGame() {
-  clearInterval(moveBall)
+  clearInterval(gameTimer)
   removeEventListener("keydown", (e) => moveUser(e))
 }
 
