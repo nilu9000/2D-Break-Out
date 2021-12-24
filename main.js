@@ -24,6 +24,9 @@ let gameTimer;
 
 let score = 0;
 
+let blockCollision = false;
+let userCollision = false;
+
 function getHandles() {
   grid = document.querySelector(".grid")
   gameMessage = document.querySelector(".game-message")
@@ -51,17 +54,17 @@ function moveUser(event) {
     case "ArrowLeft":
       if (userPosition[0] > 0) {
         userPosition[0] -= 10
+        drawUser()
       }
-      drawUser()
       break;
     case "ArrowRight":
       if (userPosition[0] < BOARD_WIDTH - Block.width) {
         userPosition[0] += 10
+        drawUser()
       }
 
-      drawUser()
       break;
-    
+
     default:
       break;
   }
@@ -101,7 +104,9 @@ function checkBlockCollision() {
       x_ball + BALL_SIZE > x_block &&
       x_ball < x_block  + Block.width &&
       y_ball + BALL_SIZE > y_block &&
-      y_ball < y_block + Block.height
+      y_ball < y_block + Block.height &&
+      ballDirectionY > 0 &&
+      !blockCollision
     ) {
       score  = score + block.score
       gameMessage.innerText = "Score: " + score
@@ -110,6 +115,8 @@ function checkBlockCollision() {
       blocks.splice(index, 1)
 
       changeDirection(1, -1 )
+      blockCollision = true;
+      userCollision = false
     }
   })
 
@@ -121,9 +128,13 @@ function checkBlockCollision() {
 function checkUserCollision() {
   if (ballPosition[1] <= userStartPosition[1] + USER_HEIGHT &&
     ballPosition[0] > userPosition[0] &&
-    ballPosition[0] < userPosition[0] + USER_WIDTH
+    ballPosition[0] < userPosition[0] + USER_WIDTH &&
+    ballDirectionY < 0 &&
+    !userCollision
     ) {
     changeDirection(1, -1)
+    userCollision = true;
+    blockCollision = false;
   }
 }
 
@@ -138,7 +149,7 @@ function checkWallCollision() {
     if (ballPosition[0] < 0) {
       changeDirection(-1, 1)
     }
-  
+
   // Kollar när bollen studsar på höger vägg
   if (ballPosition[0] >= BOARD_WIDTH - BALL_SIZE) {
     changeDirection(-1, 1)
@@ -147,6 +158,8 @@ function checkWallCollision() {
   // Kollar när bollen studsar på taket
   if (ballPosition[1] >= BOARD_HEIGHT - BALL_SIZE) {
     changeDirection(1, -1)
+    blockCollision = false;
+    userCollision = false;
   }
   // Kollar när bollen studsar på golvet
   if (ballPosition[1] < 0) {
